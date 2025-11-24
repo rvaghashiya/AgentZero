@@ -147,25 +147,6 @@ class AIAgent:
         except Exception as e:
             logger.error(f"Claude API error: {e}", exc_info=True)
             raise e
-        
-    def _test_gemini_connection(self):
-        """Test connection to Gemini API and log the result."""
-        try:
-            response = client.models.generate_content(
-                model="gemini-2.5-flash", 
-                contents="Explain how AI works in a few words"
-            )
-            print(response.text)
-            
-            if response.text:
-                logger.info("Successfully connected to Gemini and received a response.")
-                return True
-            else:
-                logger.error("Connected to Gemini, but received an empty response.")
-                return False
-        except Exception as e:
-            logger.error(f"Failed to connect to Gemini: {e}", exc_info=True)
-            return False
     
     def _call_gemini(self, prompt: str) -> Dict:
         """
@@ -183,9 +164,7 @@ class AIAgent:
                         
             # The client gets the API key from the environment variable `GEMINI_API_KEY`.
             client = genai.Client(api_key=self.config.GOOGLE_API_KEY)   
-            
-            self._test_gemini_connection()    
-                        
+                                    
             config = types.GenerateContentConfig(
                         system_instruction=self.system_prompt,
                         thinking_config=types.ThinkingConfig(
@@ -211,8 +190,6 @@ class AIAgent:
                     )                        
             
             response_text = response.text
-            
-            # print("Gemini raw response text:", response_text)  # Debug print
             
             # # Try to extract JSON from response
             # if "```json" in response_text:

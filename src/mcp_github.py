@@ -172,9 +172,6 @@ class GitHubMCPServer:
         if details:
             logger.debug(f"   Details: {details}")
     
-    # -----------------------------
-    # FINAL PATCHED VERSION (ONLY)
-    # -----------------------------
     def list_repositories(self, obo_token) -> Dict[str, Any]:
         """
         List repositories accessible to user
@@ -225,37 +222,6 @@ class GitHubMCPServer:
         )
         
         return {"repos": accessible_repos, "count": len(accessible_repos)}
-    
-        ###### old version ######
-        # operation = self.operations["list_repositories"]
-        
-        # if not self._validate_obo_token(obo_token, operation.required_scope):
-        #     return {"error": "Unauthorized - missing required permissions", "repos": []}
-        
-        # # Filter repos based on permissions
-        # accessible_repos = []
-        # for repo_name, repo_data in MockGitHubData.REPOS.items():
-        #     if repo_data["visibility"] == "public":
-        #         accessible_repos.append({
-        #             "name": repo_name,
-        #             "visibility": "public",
-        #             "description": repo_data.get("description", "")
-        #         })
-        #     elif "github:read_private_repos" in obo_token.scopes or "github:*" in obo_token.scopes:
-        #         accessible_repos.append({
-        #             "name": repo_name,
-        #             "visibility": "private",
-        #             "description": repo_data.get("description", "")
-        #         })
-        
-        # self._log_access(
-        #     "ALLOWED", 
-        #     "list_repositories", 
-        #     obo_token, 
-        #     f"Found {len(accessible_repos)} accessible repositories"
-        # )
-        
-        # return {"repos": accessible_repos, "count": len(accessible_repos)}
     
     def read_file(self, obo_token, repo: str, filename: str) -> Dict[str, Any]:
         """
