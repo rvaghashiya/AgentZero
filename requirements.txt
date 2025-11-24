@@ -1,0 +1,15 @@
+# Secure AI Agent - Python Dependencies
+
+# Web Framework
+flask==3.0.0
+flask-cors==4.0.0
+
+# AI Providers
+# anthropic==0.39.0
+google-genai
+
+# Environment & Configuration
+python-dotenv==1.0.0
+
+# Utilities
+requests==2.31.0

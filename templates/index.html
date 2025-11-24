@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure AI Agent - Interactive Demo</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>🛡️ Secure AI Agent</h1>
+            <p class="subtitle">Identity Propagation (OBO) + Least Privilege Tooling</p>
+            <div class="system-status">
+                <span id="aiProvider">AI Provider: Loading...</span>
+                <span id="systemStatus" class="status-indicator">●</span>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Panel: User Selection & Controls -->
+            <aside class="sidebar">
+                <div class="card">
+                    <h2>👤 User Identity</h2>
+                    <div class="user-selection">
+                        <label for="userRole">Select User Role:</label>
+                        <select id="userRole" class="form-control">
+                            <option value="">-- Select Role --</option>
+                            <option value="admin">Admin (Superuser - Full Access)</option>
+                            <option value="developer">Developer (Limited Access)</option>
+                            <option value="finance">Finance (Read-Only)</option>
+                            <option value="marketing">Marketing (Public Only)</option>
+                        </select>
+                        <button id="loginBtn" class="btn btn-primary">Login</button>
+                    </div>
+                    
+                    <div id="userInfo" class="user-info hidden">
+                        <h3>Current User</h3>
+                        <p><strong>Email:</strong> <span id="userEmail"></span></p>
+                        <p><strong>Role:</strong> <span id="userRoleName"></span></p>
+                        <p><strong>Token:</strong> <code id="userToken"></code></p>
+                        
+                        <h4>Permissions:</h4>
+                        <ul id="userPermissions" class="permissions-list"></ul>
+                        
+                        <h4>Available Tools:</h4>
+                        <ul id="availableTools" class="tools-list"></ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🔴 Attack Simulations</h2>
+                    <p class="help-text">Test security controls with predefined attacks</p>
+                    <div class="attack-buttons">
+                        <button class="btn btn-danger btn-sm" data-attack="prompt_injection">Prompt Injection</button>
+                        <button class="btn btn-danger btn-sm" data-attack="privilege_escalation">Privilege Escalation</button>
+                        <button class="btn btn-danger btn-sm" data-attack="confused_deputy">Confused Deputy</button>
+                        <button class="btn btn-danger btn-sm" data-attack="data_exfiltration">Data Exfiltration</button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Center Panel: Prompt Input & Results -->
+            <main class="main-panel">
+                <div class="card">
+                    <h2>💬 AI Agent Prompt</h2>
+                    <div class="prompt-section">
+                        <textarea id="userPrompt" class="prompt-input" placeholder="Enter your request in natural language...&#10;&#10;Examples:&#10;  • List all repositories I can access&#10;  • Show me the README from the website repo&#10;  • Create an issue in the API service&#10;  • Read the config file from private/api-service"></textarea>
+                        
+                        <div class="prompt-actions">
+                            <button id="executeBtn" class="btn btn-primary btn-large" disabled>
+                                <span class="btn-text">Execute with AI Agent</span>
+                                <span class="btn-loader hidden">⏳ Processing...</span>
+                            </button>
+                            <button id="clearBtn" class="btn btn-secondary">Clear</button>
+                        </div>
+
+                        <div class="example-prompts">
+                            <strong>Quick Examples:</strong>
+                            <button class="btn-link" data-prompt="List all repositories I can access">List repositories</button>
+                            <button class="btn-link" data-prompt="Show me the README from public/website">Read README</button>
+                            <button class="btn-link" data-prompt="List issues in private/api-service">List issues</button>
+                            <button class="btn-link" data-prompt="Create an issue titled 'Fix bug' in public/website">Create issue</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div id="resultsSection" class="card hidden">
+                    <h2>📊 Execution Result</h2>
+                    <div id="resultContent"></div>
+                </div>
+
+                <!-- Audit Log -->
+                <div class="card">
+                    <h2>📋 Audit Log</h2>
+                    <div class="audit-controls">
+                        <button id="refreshAuditBtn" class="btn btn-secondary btn-sm">Refresh</button>
+                        <button id="clearAuditBtn" class="btn btn-secondary btn-sm">Clear Display</button>
+                    </div>
+                    <div id="auditLog" class="audit-log">
+                        <p class="help-text">Audit log will appear here after operations...</p>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Right Panel: Information & Stats -->
+            <aside class="info-panel">
+                <div class="card">
+                    <h2>📈 Statistics</h2>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <span class="stat-value" id="statTotal">0</span>
+                            <span class="stat-label">Total Operations</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value success" id="statAllowed">0</span>
+                            <span class="stat-label">Allowed</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value error" id="statBlocked">0</span>
+                            <span class="stat-label">Blocked</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>👥 Role Permissions</h2>
+                    <div class="role-info">
+                        <div class="role-item">
+                            <strong>🔴 Admin</strong>
+                            <p>Superuser - Full access to all operations (github:*)</p>
+                        </div>
+                        <div class="role-item">
+                            <strong>🟡 Developer</strong>
+                            <p>Read/write access, but NO delete or admin operations</p>
+                        </div>
+                        <div class="role-item">
+                            <strong>🟢 Finance</strong>
+                            <p>Read-only access to public repositories</p>
+                        </div>
+                        <div class="role-item">
+                            <strong>🔵 Marketing</strong>
+                            <p>Public repositories only, README access</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🔐 Security Features</h2>
+                    <div class="security-features">
+                        <div class="feature">
+                            <span class="feature-icon">✅</span>
+                            <div>
+                                <strong>Identity Propagation</strong>
+                                <p>OBO token exchange maintains user identity</p>
+                            </div>
+                        </div>
+                        <div class="feature">
+                            <span class="feature-icon">✅</span>
+                            <div>
+                                <strong>Least Privilege</strong>
+                                <p>Tools filtered by user permissions</p>
+                            </div>
+                        </div>
+                        <div class="feature">
+                            <span class="feature-icon">✅</span>
+                            <div>
+                                <strong>Audit Trail</strong>
+                                <p>Complete identity chain logging</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>ℹ️ How It Works</h2>
+                    <ol class="how-it-works">
+                        <li><strong>Select User:</strong> Choose a role (Admin/Developer/Finance/Marketing)</li>
+                        <li><strong>Login:</strong> Get authentication token with role-based permissions</li>
+                        <li><strong>Enter Prompt:</strong> Type natural language request</li>
+                        <li><strong>AI Analyzes:</strong> Claude/Gemini interprets your intent</li>
+                        <li><strong>Security Check:</strong> OBO + Least Privilege enforcement</li>
+                        <li><strong>Execution:</strong> MCP server validates and executes</li>
+                        <li><strong>Audit:</strong> Complete identity chain logged</li>
+                    </ol>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
